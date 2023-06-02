@@ -51,7 +51,7 @@ Copy the code below as a template to create your own module:
 
 ```js
 // Anim module class
-class DC_AnimTemplate extends DC_AnimBase {
+class DC_ModuleTemplate extends DC_AnimBase {
 
     // Set the module slug below
     constructor() {
@@ -106,5 +106,5 @@ class DC_AnimTemplate extends DC_AnimBase {
 
 }
 
-new DC_AnimTemplate();
+new DC_ModuleTemplate();
 ```
