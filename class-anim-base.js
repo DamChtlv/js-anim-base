@@ -76,7 +76,7 @@ class DC_AnimBase {
 
         // Selectors
         this.header = document.querySelector('header');
-        this.sections = Array.from(document.querySelectorAll('section'));
+        this.sections =  [ ...document.querySelectorAll('section') ];
 
     }
 
