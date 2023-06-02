@@ -27,13 +27,29 @@ class MagneticButton extends DC_AnimBase {
 }
 ```
 3. **To set some specific properties for your module**, use `setProperties()` method and call `super.setProperties();` to inherit parent properties.  
-Inside this method, you can set some **requirements** / **lib dependencies** with `this.libs` array property _(ex: `this.libs.push('Splide')`)_  
+Inside this method, you can set some **requirements** / **lib dependencies** with `this.libs` array property, ex:    
+```js
+// 0. Set / update properties
+setProperties() {
+
+    // Set back parent properties first
+    super.setProperties()
+
+    // Set my module properties
+    this.libs.push('gsap')
+    this.observedEls = [ ...document.querySelectorAll('h2') ]
+}
+```
+
 You can also set which elements should be **observed** using `this.observedEls` array property and  
 the **2 methods**: `isVisible()` / `isNotVisible()` will be called from **within your module code**.
-See [Module template](https://github.com/DamChtlv/js-anim-base/tree/main/README.md#module-template) for a clear example.
+
+See [Module template](https://github.com/DamChtlv/js-anim-base/tree/main/README.md#module-template) for a complete example.
 
 ## © Module template
-```
+Copy the code below as a template to create your own module:  
+
+```js
 // Anim module class
 class DC_AnimTemplate extends DC_AnimBase {
 
@@ -48,7 +64,7 @@ class DC_AnimTemplate extends DC_AnimBase {
         // Set back parent properties first
         super.setProperties();
 
-        // (uncomment below if needed)
+        // Set my module properties (uncomment below if needed)
         //this.libs.push('')
         //this.observedEls = [ ...document.querySelectorAll('h2') ]
     }
