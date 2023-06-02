@@ -20,7 +20,7 @@ onReady() {
 
   const h1 = document.querySelector('h1')
   if ( h1 ) {
-    this.log( 'H1 found!, h1 )
+    this.log( 'H1 found!', h1 )
   }
 
 }
