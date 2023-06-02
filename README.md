@@ -6,13 +6,13 @@ JS class i often use as base to extend and make some reusable animations as modu
 ## 🛠 Features
 - **Properties**: `breakpoints, isMobile, isTablet, isDesktop...`
 - **Helpers**: `lerp, debounce, throttle...`
-- **Modules**: _Global intersection observer, [extensible](https://github.com/DamChtlv/js-anim-base/tree/main/README.md#-new-module)..._
+- **Modules**: _Global intersection observer, [extensible](https://github.com/DamChtlv/js-anims/tree/main#-new-module)..._
 - **Events built-in**: `init, ready, load, resize, scroll, isVisible, isNotVisible...`
 - **Auto lib checker**: _Give an error log when a module require a specific library which isn't loaded in the DOM_
 - **Auto check element in viewport**: _`isVisible()` and `isNotVisible()` will be called when your observed elements enter / leaves viewport_
 
 ## ❓ Usage
-Load script `class-anim-base.js` first in your document and then your script modules, ex:
+Load script `class-anim-base.js` first in your document and then your script modules:
 ```html
 <script src="class-anim-base.js"></script>
 <script src="my-module.js"></script>
@@ -20,7 +20,7 @@ Load script `class-anim-base.js` first in your document and then your script mod
     new DC_ModuleTemplate()
 </script>
 ```
-To see a module code example, see [**New module**](https://github.com/DamChtlv/js-anims/tree/main/README.md#-new-module)
+To understand how to make a new module, see [**New module**](https://github.com/DamChtlv/js-anims/tree/main#-new-module), and for a module code example, see [Module template](https://github.com/DamChtlv/js-anims/tree/main#-module-template)
 
 ## 👀 Debug
 - **Simple mode**: Use `?debug` in the URL to get all logs and use `?debug=module-name` to get specific log related to your module.
@@ -65,7 +65,7 @@ setProperties() {
 You can also set which elements should be **observed** using `this.observedEls` array property and  
 the **2 methods**: `isVisible()` / `isNotVisible()` will be called from **within your module code**.
 
-See [Module template](https://github.com/DamChtlv/js-anim-base/tree/main/README.md#-module-template) for a complete example.
+See [Module template](https://github.com/DamChtlv/js-anims/tree/main#-module-template) for a complete example.
 
 ## © Module template
 Copy the code below as a template to create your own module:  
