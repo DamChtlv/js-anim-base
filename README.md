@@ -12,9 +12,19 @@ JS class i often use as base to extend and make some reusable animations as modu
 - **Auto check element in viewport**: _`isVisible()` and `isNotVisible()` will be called when your observed elements enter / leaves viewport_
 
 ## 👀 Debug
-Use `this.log('Your log content', data)` from within your module code to display your log **when debug mode is active** _(see below)_ ⬇
 - **Simple mode**: Use `?debug` in the URL to get all logs and use `?debug=module-name` to get specific log related to your module.
 - **Advanced mode**: Use `?debughard` in the URL to get all logs + related data / elements and use `?debughard=module-name` to get specific logs related to your module.
+Use `this.log('Your log content', data)` from within your module code to display your log **when debug mode is active**, ex:
+```js
+onReady() {
+
+  const h1 = document.querySelector('h1')
+  if ( h1 ) {
+    this.log( 'H1 found!, h1 )
+  }
+
+}
+```
 
 ## ↪ New module
 1. Create a **new JavaScript class** which **extend** `DC_AnimBase`
@@ -22,7 +32,7 @@ Use `this.log('Your log content', data)` from within your module code to display
 ```js
 class MagneticButton extends DC_AnimBase {
     constructor() {
-        super('magnetic-button')
+        super( 'magnetic-button' )
     }
 }
 ```
@@ -36,8 +46,8 @@ setProperties() {
     super.setProperties()
 
     // Set my module properties
-    this.libs.push('gsap')
-    this.observedEls = [ ...document.querySelectorAll('h2') ]
+    this.libs.push( 'gsap' )
+    this.observedEls = [ ...document.querySelectorAll( 'h2' ) ]
 }
 ```
 
@@ -55,7 +65,7 @@ class DC_ModuleTemplate extends DC_AnimBase {
 
     // Set the module slug below
     constructor() {
-      super('anim-template')
+      super( 'my-module' )
     }
 
     // 0. Set / update properties
@@ -65,8 +75,8 @@ class DC_ModuleTemplate extends DC_AnimBase {
         super.setProperties();
 
         // Set my module properties (uncomment below if needed)
-        //this.libs.push('')
-        //this.observedEls = [ ...document.querySelectorAll('h2') ]
+        //this.libs.push( '' )
+        //this.observedEls = [ ...document.querySelectorAll( 'h2' ) ]
     }
 
     // 1. Execute code as soon as possible
