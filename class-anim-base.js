@@ -20,15 +20,15 @@ class DC_AnimBase {
 
         // Internal events
         this._init()
-        window.addEventListener('DOMContentLoaded', this._ready.bind(this) )
-        window.addEventListener('load', this._load.bind(this) )
+        window.addEventListener('DOMContentLoaded', this._ready.bind(this))
+        window.addEventListener('load', this._load.bind(this))
 
         // Binded events (used by extended classes)
         this.onInit()
         window.addEventListener('DOMContentLoaded', this.onReady.bind(this))
         window.addEventListener('load', this.onLoad.bind(this))
         window.addEventListener('resize', throttle(this.onResize.bind(this), 100))
-        document.addEventListener('scroll', debounce(this.onScroll.bind(this), 100), {
+        document.addEventListener('scroll', throttle(this.onScroll.bind(this), 50), {
             capture: true, // for perfs
             passive: true // for perfs
         })
@@ -45,8 +45,8 @@ class DC_AnimBase {
         }
 
         // Check if all libs are loaded
-        this.libs.forEach( lib => {
-            if (typeof window[lib] == 'undefined') {
+        this.libs.forEach(lib => {
+            if (typeof window[ lib ] == 'undefined') {
                 this.errorLog(`"${this.moduleSlug}" need "${lib}" library which is not loaded.`);
                 allow = false;
             }
@@ -60,11 +60,14 @@ class DC_AnimBase {
         // Properties
         this.libs = []; // External JavaScript libraries
         this.observedEls = [];
-        this.breakpoints = {
-            sm: getComputedStyle(document.documentElement).getPropertyValue('--pip-screen-sm').replace('px', '') || 640,
-            md: getComputedStyle(document.documentElement).getPropertyValue('--pip-screen-md').replace('px', '') || 768,
-            lg: getComputedStyle(document.documentElement).getPropertyValue('--pip-screen-lg').replace('px', '') || 1024,
-            xl: getComputedStyle(document.documentElement).getPropertyValue('--pip-screen-xl').replace('px', '') || 1280
+        if (!this?.breakpoints) {
+            const htmlStyle = getComputedStyle(document.documentElement);
+            this.breakpoints = {
+                sm: htmlStyle.getPropertyValue('--pip-screen-sm').replace('px', '') || 640,
+                md: htmlStyle.getPropertyValue('--pip-screen-md').replace('px', '') || 768,
+                lg: htmlStyle.getPropertyValue('--pip-screen-lg').replace('px', '') || 1024,
+                xl: htmlStyle.getPropertyValue('--pip-screen-xl').replace('px', '') || 1280
+            }
         }
         this.isMobile = window.innerWidth < this.breakpoints.md;
         this.isDesktop = window.innerWidth > this.breakpoints.lg;
@@ -75,8 +78,8 @@ class DC_AnimBase {
         this.isDebugHard = window.location.search.includes('debughard'); // Add "?debug" in the url to get logs
 
         // Selectors
-        this.header = document.querySelector('header');
-        this.sections =  [ ...document.querySelectorAll('section') ];
+        // this.header = document.querySelector('header');
+        // this.sections = Array.from(document.querySelectorAll('section'));
 
     }
 
@@ -103,45 +106,166 @@ class DC_AnimBase {
         }
         // Gets the mouse position
         if (!window?.getMousePos) {
-            window.getMousePos = e => { return { x: e.clientX,  y: e.clientY } };
+            window.getMousePos = e => { return { x: e.clientX, y: e.clientY } };
         }
         // Gets distance between 2 coords
         if (!window?.distance) {
-            window.distance = (x1,y1,x2,y2) => { return Math.hypot(x1 - x2, y1 - y2); }
+            window.distance = (x1, y1, x2, y2) => { return Math.hypot(x1 - x2, y1 - y2); }
         }
         // Generate a random float.
         if (!window?.getRandomFloat) {
             window.getRandomFloat = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
         }
 
+        // Load a script async as a promise
+        // ex: loadScript("https://www.youtube.com/iframe_api").then( data => { ... } )
+        // @source : https://abdessalam.dev/blog/loading-script-asynchronously-as-a-promise-in-javascript/
+        if (!window?.loadScript) {
+            window.loadScript = (src, async = true, type = "text/javascript") => {
+                return new Promise((resolve, reject) => {
+                    try {
+                        const tag = document.createElement("script");
+                        const container = document.head || document.body;
+
+                        tag.type = type;
+                        tag.async = async;
+                        tag.src = src;
+
+                        tag.addEventListener("load", () => {
+                            resolve({ loaded: true, error: false });
+                        });
+
+                        tag.addEventListener("error", () => {
+                            reject({
+                                loaded: false,
+                                error: true,
+                                message: `Failed to load script with src ${src}`,
+                            });
+                        });
+
+                        container.appendChild(tag);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            };
+        }
+
     }
 
     setModules() {
 
+        const instance = this;
+
         // Global intersection observer
         if ( !window?.DCA?.observer ) {
-            const observer = new IntersectionObserver( entries => {
+            const observer = new IntersectionObserver(entries => {
                 for (const entry of entries) {
 
                     const el = entry.target;
                     const elTextContent = el.textContent.trim().replace(/\n|\r/g, '').substring(0, 24);
                     const elInstance = el?.instance;
 
-                    // console.log(entry.intersectionRatio);
-
                     if (entry.isIntersecting) {
+
+                        el.visible = true;
                         elInstance.isVisible(el)
                         elInstance.log(`<${el.localName}> "${elTextContent}..." is in viewport 👀`, el)
+
+                        // Send event
+                        el.dispatchEvent(new Event('is_visible'));
+
                     } else {
+
+                        el.visible = false;
                         elInstance.isNotVisible(el)
                         elInstance.log(`<${el.localName}> "${elTextContent}..." is not in viewport 🙈`, el)
+
+                        // Send event
+                        el.dispatchEvent(new Event('is_not_visible'));
+
                     }
                 }
             },
                 // Options playground: https://wilsotobianco.com/experiments/intersection-observer-playground/#down
-                { rootMargin: '-100px 0px -100px 0px' }
+                {
+                    // rootMargin = viewport margin
+                    rootMargin: '-100px 0px -100px 0px',
+
+                    // Enable observer V2
+                    // trackVisibility: true,
+
+                    // Set a minimum delay between notifications (V2)
+                    // delay: 100
+                }
             )
             window.DCA.observer = observer;
+        }
+
+        // Debug modules
+        if ( this.isDebug || this.isDebugHard ) {
+
+            // Outline debugger
+            if ( !document.getElementById('outline-debugger') ) {
+
+                const style = document.createElement('style');
+                style.id = 'outline-debugger';
+                style.innerHTML = '*, :after, :before { outline: calc(var(--debug)*1px) dotted red; }';
+                document.body.appendChild(style);
+
+            }
+
+            // Debug GUI
+            if ( !window?.DCA?.gui ) {
+
+                // To stop immediatly this code while scripts are loading
+                window.DCA.gui = true;
+
+                // Get Tweakpane lib in DOM
+                loadScript('https://cdn.jsdelivr.net/npm/tweakpane@3.1.9/dist/tweakpane.min.js').then( data => {
+
+                    // Get Tweakpane Essentials plugin lib
+                    loadScript('https://cdn.jsdelivr.net/npm/@tweakpane/plugin-essentials@0.1.8/dist/tweakpane-plugin-essentials.min.js').then( data => {
+
+                        // Init GUI
+                        const GUI = new Tweakpane.Pane({
+                            title: 'DEBUG',
+                        });
+
+                        // Use Essentials plugin
+                        GUI.registerPlugin(TweakpaneEssentialsPlugin);
+
+                        // Add FPS monitoring
+                        const fpsGraph = GUI.addBlade({
+                            view: "fpsgraph",
+                            label: "FPS",
+                            lineCount: 2
+                        })
+                        function render() {
+                            fpsGraph.begin();
+
+                            // Rendering
+
+                            fpsGraph.end();
+                            requestAnimationFrame(render);
+                        }
+                        render();
+
+                        // Update GUI pos & style
+                        if ( GUI?.containerElem_ ) {
+                            GUI.containerElem_.style = 'position: fixed; top: auto; right: 1rem; bottom: 3rem; z-index: 99999;';
+                        }
+
+                        instance.log('Debug - Tweakpane loaded 🔥');
+
+                        // Store correct GUI instance
+                        window.DCA.gui = GUI;
+
+                    })
+                })
+
+            }
+
         }
 
     }
@@ -163,7 +287,7 @@ class DC_AnimBase {
     }
 
     // 1. Execute code as soon as possible
-    onInit() {}
+    onInit() { }
 
     // 2. Execute code when DOM is ready
     onReady() { }
@@ -241,7 +365,16 @@ class DC_AnimBase {
             this.observe(el);
         })
 
-        // console.log(this.observedEls);
+        // Replace all DOM links with appended "?debug"
+        if ( !window?.DCA?.debugLinks ) {
+            window.DCA.debugLinks = true;
+            const debugString = window.location.search.includes('debughard') ? 'debughard' : 'debug';
+            for ( let a of document.querySelectorAll('a') ) {
+                a.href +=
+                    (a.href.match(/\?/) ? '&' : '?') +
+                    debugString;
+            }
+        }
 
     }
 
