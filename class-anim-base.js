@@ -59,9 +59,8 @@ class DC_AnimBase {
                 lg: htmlStyle.getPropertyValue('--pip-screen-lg').replace('px', '') || 1024,
                 xl: htmlStyle.getPropertyValue('--pip-screen-xl').replace('px', '') || 1280
             }
-        } else {
-            this.breakpoints = window.DCA.breakpoints;
         }
+        this.breakpoints = window?.DCA?.breakpoints;
         this.isMobile = window.innerWidth < this.breakpoints.md;
         this.isDesktop = window.innerWidth > this.breakpoints.lg;
         this.isTablet = window.innerWidth > this.breakpoints.md && window.innerWidth < this.breakpoints.lg;
