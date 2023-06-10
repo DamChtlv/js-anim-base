@@ -186,6 +186,29 @@ class DC_AnimBase {
             window.DCA.observer = observer;
         }
 
+        // Config checker (set score from 1 to 3 based on GPU quality)
+        if ( !window?.DCA?.tierPerf ) {
+            window.DCA.tierPerf = 1;
+
+            loadScript('https://unpkg.com/detect-gpu@5.0.27/dist/detect-gpu.umd.js', true)
+                .then( data => {
+
+                    (async () => {
+                        const data = await DetectGPU.getGPUTier();
+
+                        const configs = ['intel iris plus', 'intel corporation iris graphics 6100', 'amd radeon pro 570 opengl engine'];
+                        const isLow = configs.indexOf(data.gpu) > -1 || data.fps && data.tier < 2
+                        const isMedium = configs.indexOf(data.gpu) > -1 || data.fps && data.tier > 1 && data.tier < 3;
+
+                        // Set device efficency
+                        isLow ? document.body.classList.add('lowGPU') : isMedium ? document.body.classList.add('mediumGPU') : document.body.classList.add('highGPU')
+                        document.body.dataset.tier = data.tier
+                        window.DCA.tierPerf = data.tier
+
+                    })();
+                })
+        }
+
         // Debug modules
         if ( this.isDebug || this.isDebugHard ) {
 
@@ -379,8 +402,11 @@ class DC_AnimBase {
         })
 
         // Replace all DOM links with appended "?debug"
-        if ( !window?.DCA?.debugLinks ) {
+        if ( ( this.isDebug || this.isDebugHard ) && !window?.DCA?.debugLinks ) {
+
+            // Update state
             window.DCA.debugLinks = true;
+
             const debugString = window.location.search.includes('debughard') ? 'debughard' : 'debug';
             for ( let a of document.querySelectorAll('a') ) {
                 a.href +=
