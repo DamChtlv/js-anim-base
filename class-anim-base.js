@@ -18,20 +18,11 @@ class DC_AnimBase {
         // Setup
         this.setup()
 
-        // Internal events
-        this._init()
-        window.addEventListener('DOMContentLoaded', this._ready.bind(this))
-        window.addEventListener('load', this._load.bind(this))
+        // Bind methods (so we can easily remove event listeners if needed)
+        this.bindMethods()
 
-        // Binded events (used by extended classes)
-        this.onInit()
-        window.addEventListener('DOMContentLoaded', this.onReady.bind(this))
-        window.addEventListener('load', this.onLoad.bind(this))
-        window.addEventListener('resize', throttle(this.onResize.bind(this), 100))
-        document.addEventListener('scroll', throttle(this.onScroll.bind(this), 50), {
-            capture: true, // for perfs
-            passive: true // for perfs
-        })
+        // Events listeners
+        this.events()
 
     }
 
@@ -60,14 +51,16 @@ class DC_AnimBase {
         // Properties
         this.libs = []; // External JavaScript libraries
         this.observedEls = [];
-        if (!this?.breakpoints) {
+        if (!window?.DCA?.breakpoints) {
             const htmlStyle = getComputedStyle(document.documentElement);
-            this.breakpoints = {
+            window.DCA.breakpoints = {
                 sm: htmlStyle.getPropertyValue('--pip-screen-sm').replace('px', '') || 640,
                 md: htmlStyle.getPropertyValue('--pip-screen-md').replace('px', '') || 768,
                 lg: htmlStyle.getPropertyValue('--pip-screen-lg').replace('px', '') || 1024,
                 xl: htmlStyle.getPropertyValue('--pip-screen-xl').replace('px', '') || 1280
             }
+        } else {
+            this.breakpoints = window.DCA.breakpoints;
         }
         this.isMobile = window.innerWidth < this.breakpoints.md;
         this.isDesktop = window.innerWidth > this.breakpoints.lg;
@@ -76,10 +69,6 @@ class DC_AnimBase {
         // Debug modes
         this.isDebug = window.location.search.includes('debug') && !window.location.search.includes('debughard'); // Add "?debug" in the url to get logs
         this.isDebugHard = window.location.search.includes('debughard'); // Add "?debug" in the url to get logs
-
-        // Selectors
-        // this.header = document.querySelector('header');
-        // this.sections = Array.from(document.querySelectorAll('section'));
 
     }
 
@@ -189,13 +178,9 @@ class DC_AnimBase {
             },
                 // Options playground: https://wilsotobianco.com/experiments/intersection-observer-playground/#down
                 {
-                    // rootMargin = viewport margin
                     rootMargin: '-100px 0px -100px 0px',
-
-                    // Enable observer V2
                     // trackVisibility: true,
-
-                    // Set a minimum delay between notifications (V2)
+                    // 🆕 =====ANSWER=====: Set a minimum delay between notifications
                     // delay: 100
                 }
             )
@@ -353,6 +338,35 @@ class DC_AnimBase {
 
         // Store it to compare it later with others els
         this.observedEls.push(el);
+
+    }
+
+    // Important to do this so we can easily remove event listeners if needed
+    bindMethods() {
+        this._ready = this._ready.bind(this)
+        this._load = this._load.bind(this)
+        this.onReady = this.onReady.bind(this)
+        this.onLoad = this.onLoad.bind(this)
+        this.onResize = throttle(this.onResize.bind(this), 100)
+        this.onScroll = throttle(this.onScroll.bind(this), 50)
+    }
+
+    events() {
+
+        // Internal events
+        this._init()
+        window.addEventListener('DOMContentLoaded', this._ready)
+        window.addEventListener('load', this._load)
+
+        // Events
+        this.onInit()
+        window.addEventListener('DOMContentLoaded', this.onReady)
+        window.addEventListener('load', this.onLoad)
+        window.addEventListener('resize', this.onResize)
+        document.addEventListener('scroll', this.onScroll, {
+            capture: true, // for perfs
+            passive: true // for perfs
+        })
 
     }
 
