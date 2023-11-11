@@ -1,5 +1,5 @@
 # ✨ JS Anim Template
-JS class i often use as base to extend and make some reusable animations as modules. 
+> JS class i often use as base to extend and make some reusable animations as modules. 
 
 ![image](https://github.com/DamChtlv/js-anim-base/assets/6544224/11dccdb0-2de2-4fc2-8221-91e86cdcc472)
 
