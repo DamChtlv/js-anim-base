@@ -39,13 +39,11 @@ onReady() {
 
 ## ↪ New module
 1. Create a **new JavaScript class** which **extend** `DC_AnimBase`
-2. Use a string as argument in `super()` callback inside the constructor, ex: 
 ```js
 class MagneticButton extends DC_AnimBase {
-    constructor() {
-        super( 'magnetic-button' )
-    }
+ // code
 }
+new MagneticButton()
 ```
 3. **To set some specific properties for your module**, use `setProperties()` method and call `super.setProperties();` to inherit parent properties.  
 Inside this method, you can set some **requirements** / **lib dependencies** with `this.libs` array property, ex:    
@@ -74,7 +72,7 @@ Copy the code below as a template to create your own module:
 // Anim module class
 class DC_ModuleTemplate extends DC_AnimBase {
 
-    // Set the module slug below
+    // Set a specific module slug below
     constructor() {
       super( 'my-module' )
     }
