@@ -130,3 +130,4 @@ new DC_ModuleTemplate();
 
 ## Inspi
 - Add [JS utils](https://github.com/willybrauner/utils/) && CI to test repo 👀
+- Add better [debug logging maybe?](https://github.com/debug-js/debug)
