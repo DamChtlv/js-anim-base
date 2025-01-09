@@ -128,6 +128,7 @@ class DC_ModuleTemplate extends DC_AnimBase {
 new DC_ModuleTemplate();
 ```
 
-## Inspi
+## Todos / Inspi
+- Get latest version from aleatoire & lab repos
 - Add [JS utils](https://github.com/willybrauner/utils/) && CI to test repo 👀
 - Add better [debug logging maybe?](https://github.com/debug-js/debug)
